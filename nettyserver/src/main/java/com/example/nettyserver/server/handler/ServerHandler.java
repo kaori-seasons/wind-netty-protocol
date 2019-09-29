@@ -1,12 +1,6 @@
 package com.example.nettyserver.server.handler;
 
-import com.example.nettyserver.server.common.packet.PackCodeC;
-import com.example.nettyserver.server.common.packet.Packet;
-import com.example.nettyserver.server.entity.OrderInfoRequestPacket;
-import com.example.nettyserver.server.entity.OrderInfoResponsePacket;
 import com.example.nettyserver.server.manager.NettyServerManager;
-
-import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,22 +31,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {//Http请求，
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         System.out.println("server channelRead......");
         System.out.println(ctx.channel().remoteAddress()+"----->Server :"+ msg.toString());
-        ByteBuf requestByteBuf = (ByteBuf) msg;
 
-        // 解码
-        Packet packet = PackCodeC.INSTANCE.decode(requestByteBuf);
-        if (packet instanceof OrderInfoRequestPacket){
-            logger.info(new Date()+": 收到客户端请求");
-            OrderInfoRequestPacket orderInfoRequestPacket = (OrderInfoRequestPacket) packet;
-            OrderInfoResponsePacket orderInfoResponsePacket = new OrderInfoResponsePacket();
-            orderInfoResponsePacket.setVersion(packet.getVersion());
-            orderInfoResponsePacket.setFromOrderMessage("订单已收到");
-
-            ByteBuf byteBuf = ctx.alloc().ioBuffer();
-            ByteBuf reponseByteBuf = PackCodeC.INSTANCE.encode(byteBuf,orderInfoResponsePacket);
-            ctx.channel().writeAndFlush(reponseByteBuf);
-
-        }
+        ByteBuf buf = (ByteBuf) msg;
+        byte[] req = new byte[buf.readableBytes()];
+        buf.readBytes(req);
+        System.out.println("服务端收到消息 : " + req);
 
         //定义发送的消息（不是直接发送，而是要把数据拷贝到缓冲区，通过缓冲区）
         //Unpooed：是一个专门用于拷贝Buffer的深拷贝，可以有一个或多个

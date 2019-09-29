@@ -1,7 +1,19 @@
 package com.example.nettyserver.server.handler;
 
+import com.example.nettyserver.server.common.packet.PackCodeC;
+import com.example.nettyserver.server.common.packet.Packet;
+import com.example.nettyserver.server.entity.OrderInfoRequestPacket;
+import com.example.nettyserver.server.entity.OrderInfoResponsePacket;
 import com.example.nettyserver.server.entity.OrgInfo;
 import com.example.nettyserver.server.manager.NettyServerManager;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -10,15 +22,20 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshaker;
+import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-
-import java.io.UnsupportedEncodingException;
-
 public class SocketHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger logger  = LogManager.getLogger(SocketHandler.class);
 
     public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private WebSocketServerHandshaker handshaker;
@@ -51,6 +68,7 @@ public class SocketHandler extends ChannelInboundHandlerAdapter {
      * 当客户端主动链接服务端的链接后，这个通道就是活跃的了。
      *
      */
+    @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 //      System.out.println(ctx.channel().localAddress().toString() + " 通道已激活！");
     }
@@ -62,6 +80,7 @@ public class SocketHandler extends ChannelInboundHandlerAdapter {
      * 当客户端主动断开服务端的链接后，这个通道就是不活跃的。
      *
      */
+    @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 //      System.out.println(ctx.channel().localAddress().toString() + " 通道不活跃！");
     }
@@ -75,6 +94,24 @@ public class SocketHandler extends ChannelInboundHandlerAdapter {
             handleHttpRequest(ctx, (FullHttpRequest) msg);
         } else if (msg instanceof WebSocketFrame) {// 如果是Websocket请求，则进行websocket操作
             handleWebSocketFrame(ctx, (WebSocketFrame) msg);
+        }
+
+
+        ByteBuf requestByteBuf = (ByteBuf) msg;
+
+        // 解码
+        Packet packet = PackCodeC.INSTANCE.decode(requestByteBuf);
+        if (packet instanceof OrderInfoRequestPacket){
+            logger.info(new Date()+": 收到客户端请求");
+            OrderInfoRequestPacket orderInfoRequestPacket = (OrderInfoRequestPacket) packet;
+            OrderInfoResponsePacket orderInfoResponsePacket = new OrderInfoResponsePacket();
+            orderInfoResponsePacket.setVersion(packet.getVersion());
+            orderInfoResponsePacket.setFromOrderMessage("订单已收到");
+
+            ByteBuf byteBuf = ctx.alloc().ioBuffer();
+            ByteBuf reponseByteBuf = PackCodeC.INSTANCE.encode(byteBuf,orderInfoResponsePacket);
+            ctx.channel().writeAndFlush(reponseByteBuf);
+
         }
     }
     /*

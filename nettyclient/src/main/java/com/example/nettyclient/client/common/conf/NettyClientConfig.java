@@ -1,7 +1,10 @@
 package com.example.nettyclient.client.common.conf;
 
 
+import com.example.nettyclient.client.boostrap.NettyClient;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -23,6 +26,11 @@ public  class NettyClientConfig {
     @Value("${netty.remote.port}")
     private Integer remoteHostPort;
 
+    @Bean
+    public NettyClient getNettyClient(){
+        return new NettyClient(remoteHostAddress,remoteHostPort);
+    }
+
     public String getLocalHostaddress() {
         return localHostaddress;
     }
@@ -38,4 +46,6 @@ public  class NettyClientConfig {
     public Integer getRemoteHostPort() {
         return remoteHostPort;
     }
+
+
 }

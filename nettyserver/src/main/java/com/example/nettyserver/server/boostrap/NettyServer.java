@@ -1,22 +1,43 @@
 package com.example.nettyserver.server.boostrap;
 
+import com.example.nettyserver.server.common.NettyServerConfig;
 import com.example.nettyserver.server.initializer.NettyServerInitializer;
+
+import java.net.InetSocketAddress;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
 
 @Component
-public class TestNettyServer {
-    private static final Logger logger  = LogManager.getLogger(TestNettyServer.class);
+public class NettyServer {
+    private static final Logger logger  = LogManager.getLogger(NettyServer.class);
 
-    public void start(InetSocketAddress localAddress){
+    @Autowired
+    private NettyServerConfig nettyServerConfig;
+
+    private String address;
+    private int port;
+
+    public NettyServer() {
+    }
+
+    public NettyServer(String address, int port) {
+        this.address = address;
+        this.port = port;
+    }
+
+    @PostConstruct
+    public void start(){
         /**
          * 定义一对线程组（两个线程池）
          *
@@ -32,6 +53,7 @@ public class TestNettyServer {
              *
              */
             ServerBootstrap serverBootstrap = new ServerBootstrap();
+            InetSocketAddress localAddress = new InetSocketAddress(nettyServerConfig.getLocalHostaddress(),nettyServerConfig.getLocalHostport());
             //需要去针对一个之前的线程模型（上面定义的是主从线程）
             serverBootstrap.group(bossGroup, workerGroup)
                     //设置NIO的双向通道
