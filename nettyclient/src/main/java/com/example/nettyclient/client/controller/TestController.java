@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -30,7 +32,8 @@ public class TestController {
     @Autowired
     private NettyClient nettyClient;
 
-    @RequestMapping("/test/{msg}")
+    @RequestMapping(value ="/test/{msg}",method = { RequestMethod.GET,RequestMethod.POST})
+    @ResponseBody
     public String sendMsg(@PathVariable("msg") String msg) {
         //获取建立的channel
         ChannelFuture cf = nettyClient.getChannelFuture();

@@ -1,5 +1,7 @@
 package com.example.nettyclient.client.handler;
 
+import com.example.nettyclient.client.common.dispatcher.NettyRequestDispatcher;
+import com.example.nettyclient.client.common.metadata.MethodInvokeMeta;
 import com.example.nettyclient.client.common.packet.PackCodeC;
 import com.example.nettyclient.client.common.packet.Packet;
 import com.example.nettyclient.client.entity.OrderInfoResponsePacket;
@@ -8,6 +10,7 @@ import java.util.Date;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,6 +26,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
     private String data;
     private long readByte;
     private long contentLength;
+
+    //注入请求分发器
+    @Autowired
+    private NettyRequestDispatcher dispatcher;
+    private int lossConnectCount = 0;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -64,6 +72,11 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             }else {
                 logger.info(new Date()+"订单发送失败");
             }
+            MethodInvokeMeta invokeMeta = (MethodInvokeMeta) msg;
+            logger.info("{} -> [客户端信息] \n 方法名  - > {} \n 参数列表  -> {} \n " +
+                    "返回值  ->  {} ", this.getClass().getName(), invokeMeta.getMethodName(), invokeMeta.getArgs()
+                , invokeMeta.getReturnType());
+            this.dispatcher.dispatcher(ctx, invokeMeta);
         }
 
 
