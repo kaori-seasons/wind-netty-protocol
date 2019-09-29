@@ -1,21 +1,18 @@
 package com.example.nettyclient.client.handler;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelPromise;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponse;
+import com.example.nettyclient.client.common.packet.PackCodeC;
+import com.example.nettyclient.client.common.packet.Packet;
+import com.example.nettyclient.client.entity.OrderInfoResponsePacket;
+
+import java.util.Date;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.charset.Charset;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 
 public class ClientHandler extends ChannelInboundHandlerAdapter {
 
@@ -56,21 +53,36 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         logger.info("--------");
         logger.info("ClientHandler read Message:"+msg);
 
-        if (msg instanceof HttpResponse) {
-            HttpResponse response = (HttpResponse) msg;
-            contentLength = Long.parseLong(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
-            readByte = 0;
-        }
-        if (msg instanceof HttpContent) {
-            HttpContent content = (HttpContent) msg;
-            ByteBuf buf = content.content();
-            readByte += buf.readableBytes();
-            data += buf.toString(Charset.forName("gb2312"));
-            if (readByte >= contentLength) {
-                promise.setSuccess();
+        ByteBuf byteBuf = (ByteBuf) msg;
+        Packet packet = PackCodeC.INSTANCE.decode(byteBuf);
+
+        if (packet instanceof OrderInfoResponsePacket){
+            //如果是这个数据包
+            OrderInfoResponsePacket orderInfoResponsePacket = (OrderInfoResponsePacket) packet;
+            if (orderInfoResponsePacket.isSuccess()) {
+                logger.info(new Date() + "订单发送成功");
+            }else {
+                logger.info(new Date()+"订单发送失败");
             }
-            buf.release();
         }
+
+
+
+        //if (msg instanceof HttpResponse) {
+        //    HttpResponse response = (HttpResponse) msg;
+        //    contentLength = Long.parseLong(response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
+        //    readByte = 0;
+        //}
+        //if (msg instanceof HttpContent) {
+        //    HttpContent content = (HttpContent) msg;
+        //    ByteBuf buf = content.content();
+        //    readByte += buf.readableBytes();
+        //    data += buf.toString(Charset.forName("gb2312"));
+        //    if (readByte >= contentLength) {
+        //        promise.setSuccess();
+        //    }
+        //    buf.release();
+        //}
     }
 
 

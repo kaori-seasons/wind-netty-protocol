@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>netty</artifactId>
+    <artifactId>nettyserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>netty</name>
+    <name>nettyserver</name>
     <description>Netty project for Spring Boot</description>
 
     <properties>

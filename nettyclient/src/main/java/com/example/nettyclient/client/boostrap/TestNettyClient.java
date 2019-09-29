@@ -1,18 +1,20 @@
 package com.example.nettyclient.client.boostrap;
 
 import com.example.nettyclient.client.initializer.ClientChannelInitializer;
+
+import java.net.InetSocketAddress;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 
 @Component
@@ -66,9 +68,6 @@ public class TestNettyClient {
                     connect(bootstrap, remoteAddress.getAddress().getHostAddress(), remoteAddress.getPort(),4);
                 }
             }).sync();
-            //7.绑定端口，开始递送进来的连接，推送消息
-            future.channel().writeAndFlush("Hello Netty-Server");
-            logger.info("------ 已发送数据到"+remoteAddress.getAddress().getHostAddress()+":"+remoteAddress.getPort());
             future.channel().closeFuture().sync();
         }catch (Exception e){
             e.printStackTrace();

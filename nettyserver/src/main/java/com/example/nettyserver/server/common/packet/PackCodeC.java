@@ -3,11 +3,11 @@ package com.example.nettyserver.server.common.packet;
 
 import com.example.nettyserver.server.common.Serializer.JSONSerializer;
 import com.example.nettyserver.server.common.Serializer.Serializer;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufAllocator;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * 封装自定义协议包
@@ -26,9 +26,9 @@ public class PackCodeC {
         Serializer serializer = new JSONSerializer();
     }
 
-    public ByteBuf encode(Packet packet) {
+    public ByteBuf encode(ByteBuf byteBuf,Packet packet) {
         // 1. 创建 ByteBuf 对象
-        ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
+        //ByteBuf byteBuf = ByteBufAllocator.DEFAULT.ioBuffer();
         // 2. 序列化 Java 对象
         byte[] bytes = Serializer.DEFAULT.serialize(packet);
 

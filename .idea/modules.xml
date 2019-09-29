@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/nettyserver/netty.iml" filepath="$PROJECT_DIR$/nettyserver/netty.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nettyclient/nettyclient.iml" filepath="$PROJECT_DIR$/nettyclient/nettyclient.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/wind-netty-protocol.iml" filepath="$PROJECT_DIR$/.idea/wind-netty-protocol.iml" />
+    </modules>
+  </component>
+</project>
