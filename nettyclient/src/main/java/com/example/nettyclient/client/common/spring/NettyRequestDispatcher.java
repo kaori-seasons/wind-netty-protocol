@@ -5,7 +5,7 @@
  * You shall not disclose such Confidential Information and shall use it only
  * in accordance with the terms of the license agreement you entered into with GuaHao.com.
  */
-package com.example.nettyclient.client.common.dispatcher;
+package com.example.nettyclient.client.common.spring;
 
 import com.example.nettyclient.client.common.conf.NettyConstant;
 import com.example.nettyclient.client.common.metadata.MethodInvokeMeta;
