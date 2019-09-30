@@ -11,12 +11,14 @@ import com.example.nettyclient.client.common.spring.NettyBeanScanner;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * netty的初始化入口
  * @author chengxy
  * 2019/9/30
  */
+@Configuration
 public class NettyClientConfiguration {
 
     /**

@@ -2,14 +2,14 @@ package com.example.nettyserver.server.manager;
 
 import com.example.nettyserver.server.entity.OrgInfo;
 import com.example.nettyserver.server.util.NettyUtils;
-import io.netty.channel.Channel;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.util.internal.StringUtil;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import io.netty.channel.Channel;
+import io.netty.util.internal.StringUtil;
 
 
 public class NettyServerManager {
@@ -49,7 +49,7 @@ public class NettyServerManager {
                     OrgInfo userInfo = userInfos.get(ch);
                     if (!userInfo.getUserId().equals(uid) ) continue;
                     String backmessage=sender+","+message;
-                    ch.writeAndFlush(new TextWebSocketFrame(backmessage));
+                    ch.writeAndFlush(userInfo);
                     /*  responseToClient(ch,message);*/
                 }
             } finally {

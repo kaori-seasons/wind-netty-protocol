@@ -1,11 +1,11 @@
 package com.example.nettyserver.server.handler;
 
+import com.example.nettyserver.server.entity.OrgInfo;
 import com.example.nettyserver.server.manager.NettyServerManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -29,19 +29,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {//Http请求，
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("server channelRead......");
-        System.out.println(ctx.channel().remoteAddress()+"----->Server :"+ msg.toString());
+        //logger.info("server channelRead......"+msg.toString());
 
-        ByteBuf buf = (ByteBuf) msg;
-        byte[] req = new byte[buf.readableBytes()];
-        buf.readBytes(req);
-        System.out.println("服务端收到消息 : " + req);
-
-        //定义发送的消息（不是直接发送，而是要把数据拷贝到缓冲区，通过缓冲区）
-        //Unpooed：是一个专门用于拷贝Buffer的深拷贝，可以有一个或多个
-        //CharsetUtil.UTF_8：Netty提供
-        //ByteBuf content = Unpooled.copiedBuffer("Hello Netty", CharsetUtil.UTF_8);
-        //ctx.channel().writeAndFlush(content);
+        OrgInfo orgInfo = (OrgInfo) msg;
+        System.out.println("服务端收到消息来自 : " + orgInfo.getAddr());
+        ctx.channel().writeAndFlush(orgInfo);
         logger.info(" --------- 已发送数据 ---------- 到"+ctx.channel().remoteAddress());
     }
 

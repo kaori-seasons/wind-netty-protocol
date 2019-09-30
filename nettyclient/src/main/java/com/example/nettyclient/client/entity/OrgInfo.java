@@ -1,4 +1,4 @@
-package com.example.nettyserver.server.entity;
+package com.example.nettyclient.client.entity;
 
 import java.io.Serializable;
 

@@ -1,7 +1,7 @@
 package com.example.nettyclient.client.handler;
 
 import com.example.nettyclient.client.common.spring.NettyRequestDispatcher;
-import com.example.nettyclient.client.common.metadata.MethodInvokeMeta;
+import com.example.nettyclient.client.entity.OrgInfo;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +34,13 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
             e.printStackTrace();
         }
         this.ctx = ctx;
-        logger.info("ClientHandler Active");
+        logger.info("client 通道已建立");
+        OrgInfo orgInfo = new OrgInfo();
+        orgInfo.setUserId(ctx.channel().id().asLongText());
+        orgInfo.setChannel(ctx.channel());
+        orgInfo.setAddr(ctx.channel().localAddress().toString());
+        // 写数据
+        ctx.channel().writeAndFlush(orgInfo);
     }
 
     @Override
@@ -44,17 +50,18 @@ public class ClientHandler extends ChannelInboundHandlerAdapter {
         logger.info("ClientHandler read Message:"+msg);
 
 
-        MethodInvokeMeta invokeMeta = (MethodInvokeMeta) msg;
-        logger.info("{} -> [客户端信息] \n 方法名  - > {} \n 参数列表  -> {} \n " +
-                "返回值  ->  {} ", this.getClass().getName(), invokeMeta.getMethodName(), invokeMeta.getArgs()
-            , invokeMeta.getReturnType());
-        this.dispatcher.dispatcher(ctx, invokeMeta);
+        //MethodInvokeMeta invokeMeta = (MethodInvokeMeta) msg;
+        //logger.info("{} -> [客户端信息] \n 方法名  - > {} \n 参数列表  -> {} \n " +
+        //        "返回值  ->  {} ", this.getClass().getName(), invokeMeta.getMethodName(), invokeMeta.getArgs()
+        //    , invokeMeta.getReturnType());
+        ctx.channel().writeAndFlush(msg);
+        //this.dispatcher.dispatcher(ctx, invokeMeta);
     }
 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        cause.printStackTrace();
+        logger.error("{} -> [通道异常] {}", this.getClass().getName(), ctx.channel().id());
         ctx.close();
     }
 

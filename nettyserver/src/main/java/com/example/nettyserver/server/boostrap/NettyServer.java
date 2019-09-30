@@ -1,7 +1,7 @@
 package com.example.nettyserver.server.boostrap;
 
 import com.example.nettyserver.server.common.NettyServerConfig;
-import com.example.nettyserver.server.initializer.NettyServerInitializer;
+import com.example.nettyserver.server.initializer.ServerChannelInitializer;
 
 import java.net.InetSocketAddress;
 
@@ -59,14 +59,18 @@ public class NettyServer {
                     //设置NIO的双向通道
                     .channel(NioServerSocketChannel.class)
                     .localAddress(localAddress)
-                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .option(ChannelOption.SO_BACKLOG, 1024)// 配置TCP参数
+                    .option(ChannelOption.SO_BACKLOG, 1024) // 设置tcp缓冲区
+                    .option(ChannelOption.SO_SNDBUF, 32 * 1024) // 设置发送缓冲大小
+                    .option(ChannelOption.SO_RCVBUF, 32 * 1024) // 这是接收缓冲大小
+                    .option(ChannelOption.SO_KEEPALIVE, true) // 保持连接
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
                     //子处理器，用于处理workerGroup
                     /**
                      * 设置chanel初始化器
                      * 每一个chanel由多个handler共同组成管道(pipeline)
                      */
-                    .childHandler(new NettyServerInitializer());
+                    .childHandler(new ServerChannelInitializer());
 
             /**
              * 启动

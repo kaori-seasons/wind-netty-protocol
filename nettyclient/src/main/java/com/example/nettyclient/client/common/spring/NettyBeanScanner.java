@@ -37,6 +37,7 @@ public class NettyBeanScanner implements BeanFactoryPostProcessor {
         this.clientName = clientName;
     }
 
+
     /**
      * 注册Bean到Spring的bean工厂
      */
