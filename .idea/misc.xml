@@ -8,6 +8,7 @@
       <list>
         <option value="$PROJECT_DIR$/nettyclient/pom.xml" />
         <option value="$PROJECT_DIR$/nettyserver/pom.xml" />
+        <option value="$PROJECT_DIR$/demo/pom.xml" />
       </list>
     </option>
   </component>

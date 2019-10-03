@@ -1,10 +1,9 @@
 package com.example.nettyclient.client.entity;
 
-import com.example.nettyclient.client.common.packet.Packet;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.socket.DatagramPacket;;import java.net.InetSocketAddress;
 
-;
-
-public class MessagePacket extends Packet {
+public class MessagePacket {
 
     private String message;
 

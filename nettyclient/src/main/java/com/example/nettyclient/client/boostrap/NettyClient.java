@@ -1,6 +1,6 @@
 package com.example.nettyclient.client.boostrap;
 
-import com.example.nettyclient.client.common.conf.NettyClientConfig;
+import com.example.demo.annotation.config.NettyConfigProperties;
 import com.example.nettyclient.client.initializer.ClientChannelInitializer;
 
 import java.net.InetSocketAddress;
@@ -21,7 +21,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-
 @Component
 public class NettyClient {
 
@@ -35,7 +34,7 @@ public class NettyClient {
     private ChannelFuture cf;
 
     @Autowired
-    private NettyClientConfig nettyClientConfig;
+    private NettyConfigProperties nettyClientConfig;
 
     public NettyClient(){
 
@@ -46,10 +45,11 @@ public class NettyClient {
         this.port = port;
     }
 
+
     private ChannelFuture connect(Bootstrap bootstrap,String host, int port,int retry) {
-        ChannelFuture result = bootstrap.connect(host, port).addListener(future -> {
+        cf = bootstrap.connect(host, port).addListener(future -> {
             if (future.isSuccess()) {
-                System.out.println("连接成功!");
+                System.out.println("客户端连接成功!");
             } else if (retry == 0) {
                 System.err.println("重试次数已用完，放弃连接！");
             } else {
@@ -59,11 +59,11 @@ public class NettyClient {
                 int delay = 1 << order;
                 System.err.println(new Date() + ": 连接失败，第" + order + "次重连……");
                 b.config().group().schedule(() -> connect(b, host, port, retry - 1), delay, TimeUnit
-                        .SECONDS);
+                    .SECONDS);
             }
         });
 
-        return result;
+        return cf;
     }
 
     @PostConstruct
@@ -75,43 +75,34 @@ public class NettyClient {
         try {
             b = new Bootstrap();
             b
-                    // 1.指定线程模型
-                    .group(workerGroup)
-                    // 2.指定 IO 类型为 NIO
-                    .channel(NioSocketChannel.class)
-                    //3.要求低延迟，禁用Nagle算法，根据MSS分包发送
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    //4.设置需要远程访问的地址
-                    .remoteAddress(remoteAddress)
-                    .localAddress(localAddress)
-                    // 5.IO 处理逻辑
-                    .handler(new ClientChannelInitializer());
+                // 1.指定线程模型
+                .group(workerGroup)
+                // 2.指定 IO 类型为 NIO
+                .channel(NioSocketChannel.class)
+                //3.要求低延迟，禁用Nagle算法，根据MSS分包发送
+                .option(ChannelOption.TCP_NODELAY, true)
+                //4.设置需要远程访问的地址
+                .remoteAddress(remoteAddress)
+                .localAddress(localAddress)
+                // 5.IO 处理逻辑
+                .handler(new ClientChannelInitializer());
 
-            //6.建立连接
-            ChannelFuture future = connect(b,remoteAddress.getAddress().getHostAddress(),remoteAddress.getPort(),5).sync();
-            future.channel().closeFuture().sync();
-            workerGroup.shutdownGracefully();
+            this.getChannelFuture();
         }catch (Exception e){
-            e.printStackTrace();
-
+            this.close();
         }
-    }
-
-
-    public ChannelFuture getChannelFuture() {
-        return this.cf;
     }
 
     //当前频道的未发起连接
-    public void getOnlineChannel(Bootstrap b,String host, int port,int retry) {
+    public ChannelFuture getChannelFuture() {
+        InetSocketAddress remoteAddress = new InetSocketAddress(nettyClientConfig.getRemoteHostAddress(),nettyClientConfig.getRemoteHostPort());
         // 如果没有连接先链接
         if (this.cf == null) {
-            this.connect(b,host, port,retry);
-        } // this.cf.channel().isActive() 这里得到的是链接状态
-        if (!this.cf.channel().isActive()) {
-            this.connect(b,host, port,retry);
+            this.connect(b,remoteAddress.getAddress().getHostAddress(),remoteAddress.getPort(),5);
         }
+        return this.cf;
     }
+
 
     //释放资源
     public void close() {

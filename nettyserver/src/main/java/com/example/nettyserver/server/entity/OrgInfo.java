@@ -6,6 +6,8 @@ import io.netty.channel.Channel;
 
 public class OrgInfo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     private String userId;  // UID
     private String addr;    // 地址
     private Channel channel;// 通道
