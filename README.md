@@ -1,6 +1,37 @@
 # wind-netty-protocol
 Custom netty coding, using the host mode for the company to push orders corresponding to a channel
 
+>架构图
+
+
+
+>通信业务流程
+
+- Agent
+
+springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责获取支付中心的支付消息并调用银行客户端完成医院医保账户对企业打款
+
+  - 向支付中心拉取配置信息，不同医院会有不同配置（医院标识、对接银行接口配置等）
+
+  - 通过保持https长连接，从支付中心获取支付消息
+
+  - 提供Agent应用状态的接口给WatchDog
+
+  - 支付数据状态保存
+
+- 支付中心
+
+作为医院管理支付数据的子系统，用户的支付动作会通过Agent调用银行接口完成支付及保存支付结果回调信息，货款支付信息也需要同步到结算子系统
+
+  - 提供支付数据推送接口
+
+  - 基于Http long polling，异步返回数据
+
+  - 基于netty双向通信
+
+  - 提供支付结果回调接口（网银客户端支付成功后，Agent通过该接口将银行支付结果反馈给支付中心，支付中心再反馈给结算中心）
+
+支付数据状态保存
 
 >客户端与服务端通信
 
