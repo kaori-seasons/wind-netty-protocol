@@ -3,7 +3,7 @@ Custom netty coding, using the host mode for the company to push orders correspo
 
 >架构图
 
-
+![医院支付消息推送](https://github.com/complone/wind-netty-protocol/blob/release-v1.0.0/project.png)
 
 >通信业务流程
 
