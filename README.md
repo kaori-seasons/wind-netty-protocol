@@ -129,6 +129,7 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
 
 - 服务端发送消息
     根据配置加载的uid，选择要发送的对应通道
+    
     ```
      BaseAppMetaDataDTO baseAppMetaDataDTO = new BaseAppMetaDataDTO();
      ChannelManager.broadcastMess(ConfigUtlis.getAppId(),baseAppMetaDataDTO);
@@ -136,9 +137,9 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     
 - 服务端接收消息 接收appId
   - 需要在注解上声明notifyAppId
+  
     ```
     public class AppInfoRecevier implements NotifyStringRecevier {
-
 
     @Override
     public void update(String message) {
@@ -149,6 +150,7 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
 
 - 服务端接收消息 BaseAppMetaDataBO
   - 需要在注解上声明"notifyTransferDTO" 接收到的消息类型为BaseAppMetaDataBO，需要与服务端应用约定解包类型自己解包
+  
   ```
     public class MsgRecevier implements NotifyReceiver {
 
@@ -159,4 +161,37 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     }
 }
   ```
+- 客户端发送消息 传入uid和channel建立映射关系
+    ```
+    @Autowired
+    private NettyClient nettyClient;
 
+    public String transToMessage(){
+        ChannelFuture channelFuture = nettyClient.getChannelFuture();
+        Channel channel = channelFuture.channel();
+        BaseAppMetaDataDTO baseAppMetaDataDTO = new BaseAppMetaDataDTO(); //新建需要传输的实体，这里传输的为顶级父类
+        TransferManager.broadcastMess(baseAppMetaDataDTO,channel);
+    }
+    ```
+
+    
+- 客户端接收消息
+
+ - 需要先在注解上声明为"notifyTransferDTO" 接收到的消息类型为JSONObject，需要与服务端应用约定解包类型自己解包
+
+   ```
+    public class MsgRecevier implements NotifyReceiver {
+
+    @Override
+    public int type() {
+        return 0;
+    }
+
+    @Override
+    public void update(BaseAppMetaDataBO message) {
+
+        System.out.println(message);
+    }
+}
+  
+   ```
