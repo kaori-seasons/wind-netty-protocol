@@ -70,7 +70,7 @@ public class ChannelManager {
                     String reqId = UUID.randomUUID().toString().replace("-", "");
                     data.setRequestId(reqId);
                     String result = JSON.toJSONString(data);
-                    String encryptHex = SymmetricCryptoUtils.getInstance().encryptHex(result);
+                    String encryptHex = SymmetricCryptoUtils.getInstance(null).encryptHex(result);
                     BaseAppMetaDataBO baseAppMetaDataBO = new BaseAppMetaDataBO();
                     baseAppMetaDataBO.setAppId(appId);
                     baseAppMetaDataBO.setEntcryStr(encryptHex);

@@ -13,6 +13,7 @@ import com.hx.nettycommon.dto.parent.BaseAppMetaDataDTO;
 import com.hx.nettycommon.util.ConfigUtlis;
 import com.hx.nettycommon.util.SymmetricCryptoUtils;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
@@ -63,16 +64,16 @@ public class TransferManager {
 
 
     /**
-     * 发送消息 需要自己加密
+     * 发送消息
      *
      * @param appInfo
      * @param channel 选择通道
      */
-    public static synchronized void broadcastMess(BaseAppMetaDataDTO appInfo, Channel channel) {
+    public static void broadcastMess(BaseAppMetaDataDTO appInfo, Channel channel) {
         broadcastMess(appInfo, channel, null);
     }
 
-    public static synchronized void broadcastMess(BaseAppMetaDataDTO appInfo, Channel channel, String encrypt) {
+    public static void broadcastMess(BaseAppMetaDataDTO appInfo, Channel channel, String encrypt) {
         if (appInfo != null) {
             try {
                 rwLock.readLock().lock();
@@ -82,7 +83,11 @@ public class TransferManager {
                 String jsonStr = JSON.toJSONString(appInfo);
                 String encryptStr = SymmetricCryptoUtils.getInstance(encrypt).encryptHex(jsonStr);
                 appMetaDataBO.setEntcryStr(encryptStr);
-                appMetaDataBO.setFlag(true);
+                appMetaDataBO.setFlag(null != encrypt);
+                if (!channel.isActive()) {
+                    log.error("channel is inactive");
+                    return;
+                }
                 channel.writeAndFlush(appMetaDataBO);
                 log.info("broadcass message body -> {}", jsonStr);
             } finally {

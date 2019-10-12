@@ -1,5 +1,6 @@
 package com.hx.nettyserver.server.initializer;
 
+import com.hx.nettyserver.server.handler.HeartbeatHandler;
 import com.hx.nettyserver.server.handler.ServerIdleStateHandler;
 import com.hx.nettyserver.server.handler.ServerReceivceAppInfoHandler;
 import com.hx.nettyserver.server.handler.ServerReplyAppInfoHandler;
@@ -38,6 +39,7 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
         //p.addLast("decoder",new JsonDecoder());
         //p.addLast("encoder", new JsonEncoder());
         p.addLast(new ServerIdleStateHandler());
+        p.addLast(new HeartbeatHandler());
         p.addLast(receivceAppInfoHandler);
         p.addLast(serverReplyAppInfoHandler);
         p.addLast(serverSendMsgHandler);

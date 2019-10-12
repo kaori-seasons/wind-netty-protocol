@@ -25,6 +25,10 @@ public class NettyClient {
     private EventLoopGroup group;
     private Bootstrap b;
     private ChannelFuture cf;
+    /**
+     * 重连的间隔
+     */
+    private static Long DELAY = 5L;
 
     @Autowired
     private NettyConfigProperties nettyClientConfig;
@@ -34,10 +38,9 @@ public class NettyClient {
     }
 
     public void connect() {
-        if (cf != null || cf.channel().isActive()) {
-            return;
+        if (cf == null || !cf.channel().isActive()) {
+            cf = connect(b, nettyClientConfig.getRemoteHostAddress(), nettyClientConfig.getRemoteHostPort(), Integer.MAX_VALUE);
         }
-        cf = connect(b, nettyClientConfig.getRemoteHostAddress(), nettyClientConfig.getRemoteHostPort(), 0);
     }
 
     private ChannelFuture connect(Bootstrap bootstrap, String host, int port, int retry) {
@@ -47,12 +50,8 @@ public class NettyClient {
             } else if (retry == 0) {
                 log.error("重试次数已用完，放弃连接！");
             } else {
-                // 第几次重连
-                int order = (8 - retry) + 1;
-                // 本次重连的间隔
-                int delay = 1 << order;
-                log.error("连接失败，第{}次重连...", order);
-                b.config().group().schedule(() -> connect(b, host, port, retry - 1), delay, TimeUnit
+                log.error("连接失败，{}s后重试...", DELAY);
+                b.config().group().schedule(() -> connect(b, host, port, retry - 1), DELAY, TimeUnit
                         .SECONDS);
             }
         });
@@ -94,7 +93,7 @@ public class NettyClient {
         InetSocketAddress remoteAddress = new InetSocketAddress(nettyClientConfig.getRemoteHostAddress(), nettyClientConfig.getRemoteHostPort());
         // 如果没有连接先链接
         if (this.cf == null) {
-            this.connect(b, remoteAddress.getAddress().getHostAddress(), remoteAddress.getPort(), 5);
+            this.connect(b, remoteAddress.getAddress().getHostAddress(), remoteAddress.getPort(), Integer.MAX_VALUE);
         }
         return this.cf;
     }
