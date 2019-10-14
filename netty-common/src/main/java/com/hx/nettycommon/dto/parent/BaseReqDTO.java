@@ -1,7 +1,5 @@
 package com.hx.nettycommon.dto.parent;
 
-import java.io.Serializable;
-
 import lombok.Data;
 
 /**
@@ -13,7 +11,7 @@ import lombok.Data;
  * @date 2019/10/8
  */
 @Data
-public class BaseReqDTO extends BaseAppMetaDataDTO implements Serializable {
+public class BaseReqDTO extends BaseAppMetaDataDTO {
 
     private static final long serialVersionUID = -1953053275664609315L;
 

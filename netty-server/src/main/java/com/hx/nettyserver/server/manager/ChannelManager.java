@@ -8,8 +8,7 @@ import com.hx.nettycommon.util.NettyUtils;
 import com.hx.nettycommon.util.SymmetricCryptoUtils;
 import io.netty.channel.Channel;
 import io.netty.util.internal.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,10 +20,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 通道建立管理器
  * 2019/10/2
  */
+@Slf4j
 public class ChannelManager {
 
 
-    private final static Logger logger = LoggerFactory.getLogger(ChannelManager.class);
+    private static UUID randomUUID = UUID.randomUUID();
 
     private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock(true);
 
@@ -43,13 +43,12 @@ public class ChannelManager {
         channelInfo.setChannel(channel);
         userInfos.put(channel, channelInfo);
         channelInfos.put(appId, userInfos);
-        logger.info("服务端添加通道");
+        log.debug("服务端添加通道");
     }
 
     public static void removeChannel(Channel channel) {
         userInfos.remove(channel);
     }
-
 
 
     /**
@@ -58,34 +57,10 @@ public class ChannelManager {
      * @param appId
      */
     public static void broadcastMess(String appId, BaseAppMetaDataDTO data) {
-        if (!StringUtil.isNullOrEmpty(appId)) {
-            try {
-                rwLock.readLock().lock();
-                ConcurrentMap<Channel, ChannelInfo> currentChannel = channelInfos.get(appId);
-                for (Channel ch : currentChannel.keySet()) {
-                    //选择连接
-                    ChannelInfo channelInfo = userInfos.get(ch);
-                    if (!channelInfo.getUserId().equals(appId))
-                        continue;
-                    String reqId = UUID.randomUUID().toString().replace("-", "");
-                    data.setRequestId(reqId);
-                    String result = JSON.toJSONString(data);
-                    String encryptHex = SymmetricCryptoUtils.getInstance(null).encryptHex(result);
-                    BaseAppMetaDataBO baseAppMetaDataBO = new BaseAppMetaDataBO();
-                    baseAppMetaDataBO.setAppId(appId);
-                    baseAppMetaDataBO.setEntcryStr(encryptHex);
-                    baseAppMetaDataBO.setFlag(false);
-                    ch.writeAndFlush(baseAppMetaDataBO);
-                    logger.info("服务端发送消息");
-                    /*  responseToClient(ch,message);*/
-                }
-            } finally {
-                rwLock.readLock().unlock();
-            }
-        }
+        broadcastMess(appId, data, null);
     }
 
-    public static synchronized void broadcastMess(String appId, BaseAppMetaDataDTO data,String encryptStr){
+    public static void broadcastMess(String appId, BaseAppMetaDataDTO data, String encryptStr) {
         if (!StringUtil.isNullOrEmpty(appId)) {
             try {
                 rwLock.readLock().lock();
@@ -93,19 +68,23 @@ public class ChannelManager {
                 for (Channel ch : currentChannel.keySet()) {
                     //选择连接
                     ChannelInfo channelInfo = userInfos.get(ch);
-                    if (!channelInfo.getUserId().equals(appId))
+                    if (!channelInfo.getUserId().equals(appId)) {
                         continue;
-                    String reqId = UUID.randomUUID().toString().replace("-", "");
+                    }
+                    String reqId = randomUUID.toString().replace("-", "");
                     data.setRequestId(reqId);
                     String result = JSON.toJSONString(data);
-                    String encryptHex  = SymmetricCryptoUtils.getInstance(encryptStr).encryptHex(result);
+                    String encryptHex = SymmetricCryptoUtils.getInstance(encryptStr).encryptHex(result);
                     BaseAppMetaDataBO baseAppMetaDataBO = new BaseAppMetaDataBO();
                     baseAppMetaDataBO.setAppId(appId);
                     baseAppMetaDataBO.setEntcryStr(encryptHex);
-                    baseAppMetaDataBO.setFlag(true);
+                    baseAppMetaDataBO.setFlag(null == encryptStr);
+                    if (!ch.isActive()) {
+                        log.info("client channel is inactive");
+                        return;
+                    }
                     ch.writeAndFlush(baseAppMetaDataBO);
-                    logger.info("服务端发送消息");
-                    /*  responseToClient(ch,message);*/
+                    log.info("broadcass message body -> {}", result);
                 }
             } finally {
                 rwLock.readLock().unlock();
@@ -128,6 +107,6 @@ public class ChannelManager {
     public static void main(String[] args) {
         // 发送 reqId
         //ChannelManager.getUserInfo("a").send();
-        
+
     }
 }

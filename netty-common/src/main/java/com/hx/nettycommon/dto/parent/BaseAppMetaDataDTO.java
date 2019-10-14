@@ -7,14 +7,15 @@
  */
 package com.hx.nettycommon.dto.parent;
 
+import java.io.Serializable;
+
 /**
  * @author chengxy
  * 2019/10/9
  */
-public class BaseAppMetaDataDTO {
+public class BaseAppMetaDataDTO implements Serializable {
 
     private String requestId;
-
 
     public String getRequestId() {
         return requestId;

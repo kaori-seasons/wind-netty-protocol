@@ -67,19 +67,6 @@
 	</dependencies>
 
 
-	<repositories>
-		<repository>
-			<id>maven-releases</id>
-			<name>User Porject Release</name>
-			<url>http://nexus.heisea.cn/nexus/content/repositories/releases/</url>
-		</repository>
-		<repository>
-			<id>maven-snapshots</id>
-			<name>User Porject Snapshot</name>
-			<url>http://nexus.heisea.cn/nexus/content/repositories/snapshots/</url>
-		</repository>
-	</repositories>
-
 	<distributionManagement>
 		<snapshotRepository>
 			<id>snapshots</id>
@@ -94,13 +81,13 @@
 		</repository>
 	</distributionManagement>
 
-<!--	<build>-->
-<!--		<plugins>-->
-<!--			<plugin>-->
-<!--				<groupId>org.springframework.boot</groupId>-->
-<!--				<artifactId>spring-boot-maven-plugin</artifactId>-->
-<!--			</plugin>-->
-<!--		</plugins>-->
-<!--	</build>-->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

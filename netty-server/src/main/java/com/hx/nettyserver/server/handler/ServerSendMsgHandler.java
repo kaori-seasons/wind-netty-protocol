@@ -10,16 +10,13 @@ package com.hx.nettyserver.server.handler;
 import com.hx.nettycommon.dto.BaseAppMetaDataBO;
 import com.hx.nettycommon.listen.parent.Listener;
 import com.hx.nettyserver.server.listen.push.PushService;
-
-import javax.annotation.Resource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
 
 /**
  * @author chengxy
@@ -27,9 +24,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  */
 @Component
 @ChannelHandler.Sharable
+@Slf4j
 public class ServerSendMsgHandler extends ChannelInboundHandlerAdapter {
-
-    private static Logger logger = LoggerFactory.getLogger(ServerSendMsgHandler.class);
 
 
     private PushService<BaseAppMetaDataBO> pushService = new PushService<>();
@@ -38,14 +34,15 @@ public class ServerSendMsgHandler extends ChannelInboundHandlerAdapter {
     private Listener listeners;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg){
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof BaseAppMetaDataBO) {
             BaseAppMetaDataBO baseAppMetaDataBO = (BaseAppMetaDataBO) msg;
-            logger.debug("服务端接收到消息： "+ baseAppMetaDataBO.getEntcryStr());
+            log.debug("server received：{}", baseAppMetaDataBO.getEntcryStr());
             pushService.registerListener(listeners);
             pushService.sendMessage(baseAppMetaDataBO);
+            ctx.channel().writeAndFlush("server received...");
+            return;
         }
-
-
+        ctx.channel().writeAndFlush("handler chan end!");
     }
 }
