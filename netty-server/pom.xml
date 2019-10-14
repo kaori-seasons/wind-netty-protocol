@@ -8,7 +8,7 @@
         <version>2.1.8.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.hxmec</groupId>
+    <groupId>com.wind</groupId>
     <artifactId>netty-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>netty-server</name>
@@ -41,7 +41,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.hxmec</groupId>
+            <groupId>com.wind</groupId>
             <artifactId>netty-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -56,18 +56,5 @@
 <!--        </plugins>-->
 <!--    </build>-->
 
-    <distributionManagement>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>User Porject Snapshot</name>
-            <url>http://nexus.heisea.cn/nexus/content/repositories/snapshots/</url>
-            <uniqueVersion>true</uniqueVersion>
-        </snapshotRepository>
-        <repository>
-            <id>releases</id>
-            <name>User Porject Release</name>
-            <url>http://nexus.heisea.cn/nexus/content/repositories/releases/</url>
-        </repository>
-    </distributionManagement>
 
 </project>

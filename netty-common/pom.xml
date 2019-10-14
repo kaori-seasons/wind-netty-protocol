@@ -66,21 +66,6 @@
 		</dependency>
 	</dependencies>
 
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>snapshots</id>
-			<name>User Porject Snapshot</name>
-			<url>http://nexus.heisea.cn/nexus/content/repositories/snapshots/</url>
-			<uniqueVersion>true</uniqueVersion>
-		</snapshotRepository>
-		<repository>
-			<id>releases</id>
-			<name>User Porject Release</name>
-			<url>http://nexus.heisea.cn/nexus/content/repositories/releases/</url>
-		</repository>
-	</distributionManagement>
-
 	<build>
 		<plugins>
 			<plugin>
