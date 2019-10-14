@@ -59,44 +59,6 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
 
 >公共配置
 
-- SM4 加密方式
-
-        ```
-    	/**
-	     * 加密
-	     */
-		String msg = "qqqqqqsssssaaaa";
-		String key = "122D9FC926BF4996";//密钥1
-		String cbc_iv = "91BB2E92B13D4398";//密钥2
-		String encryStr = SM4Crypter.encrypt(msg.getBytes("GBK"), key, cbc_iv);
-		System.out.println("密文： "+encryStr);
-
-		 /**
-	     * 解密
-	     */
-		encryStr = "mAjoJgzNcK5hENoL49Y+SoLSglqtEPdcHbgUHjAC7WyqqQy3qbbKn9TtbFyS48t8tQbGk8B9quoxWAckEcbNNGQzfYjJqHfmCrLCVqDDLNdPas5/cvrx3WmJSveGyAzS4cbG5QWG45Ev8fURzH6lhXzeaRpWdlQgdRyGXzh764G02kk3ZZl1B1jn/b7DAQOQ+XUkC65wA4Jwk1iYeJATn1iicH5FqosGaX3Zhhw/55OmxZG5n6Et1F3ZUD2OzB+s1h30d53RH48gadLrxCpQ6HAg8Oq3U1De/IMxCHEbqNdapsBeQj5UyUstPElrLitf+NhlqwIBE6BFTPJWRvAhsN1tAqWNjRGIz8oTr4jk7C4HG/gRtn+i2hx6ssyhFnGfl+QwAnHaYDVheRUZZn5Emrklhau/Y6SW/qJhB5AEiChBZP4wDASmBiSXOTpw1ekDx0vzqutY6eLKioTBFf2+YFbgLfOoxqpI9HJfoRqtPisJBpRmGClHE8pcZldE419gwYLMQJLNFQupB0VgjPxgMSDpSqRh6lCTQveMRqGbIaZ66umE+q3GclG5zRlTr2I1x9EeIuTQpd/YGMPztJEg311uEPzZjsXstwls5UWKHDxTzEKMzE3sNix96/uOfaLX";
-		String decryptStr = new String (SM4Crypter.decrypt(encryStr, key, cbc_iv),"GBK");
-		System.out.println("明文： "+decryptStr);
-        ```
-- DES加密方式
-
-```
- //待加密内容
-        String str = "测试内容";
-        //密码，长度要是8的倍数
-        String password = "9588028820109132570743325311898426347857298773549468758875018579537757772163084478873699447306034466200616411960574122434059469100235892702736860872901247123456";
-
-        byte[] result = DESCrypter.encrypt(str.getBytes(),password);
-        System.out.println("加密后："+new String(result));
-
-        //直接将如上内容解密
-        try {
-            byte[] decryResult = DESCrypter.decrypt(result, password);
-            System.out.println("解密后："+new String(decryResult));
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-```
 
 - 连接配置
     ```
@@ -127,7 +89,14 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
 
 >使用场景
 
-- 服务端发送消息
+-服务端发消息(自定义密钥加密)
+
+    ```
+    BaseAppMetaDataDTO baseAppMetaDataDTO = new BaseAppMetaDataDTO();
+     ChannelManager.broadcastMess(ConfigUtlis.getAppId(),baseAppMetaDataDTO,"key");
+    ```
+
+- 服务端发送消息(自己默认密钥加密)
     根据配置加载的uid，选择要发送的对应通道
     
     ```
@@ -149,19 +118,34 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     ```
 
 - 服务端接收消息 BaseAppMetaDataBO
-  - 需要在注解上声明"notifyTransferDTO" 接收到的消息类型为BaseAppMetaDataBO，需要与服务端应用约定解包类型自己解包
   
   ```
     public class MsgRecevier implements NotifyReceiver {
 
     @Override
-    public void update(BaseAppMetaDataBO message) {
+    public void doUpdate(JSONObject message) {
 
         System.out.println(message);
     }
 }
   ```
-- 客户端发送消息 传入uid和channel建立映射关系
+
+- 客户端发送消息(选择加密)
+
+    ```
+     @Autowired
+    private NettyClient nettyClient;
+
+    public String transToMessage(){
+        ChannelFuture channelFuture = nettyClient.getChannelFuture();
+        Channel channel = channelFuture.channel();
+        BaseAppMetaDataDTO baseAppMetaDataDTO = new BaseAppMetaDataDTO(); //新建需要传输的实体，这里传输的为顶级父类
+        TransferManager.broadcastMess(baseAppMetaDataDTO,channel,"key");
+    }
+    ```
+ 
+- 客户端发送消息(自己加密)
+
     ```
     @Autowired
     private NettyClient nettyClient;
@@ -177,8 +161,6 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     
 - 客户端接收消息
 
- - 需要先在注解上声明为"notifyTransferDTO" 接收到的消息类型为JSONObject，需要与服务端应用约定解包类型自己解包
-
    ```
     public class MsgRecevier implements NotifyReceiver {
 
@@ -188,10 +170,9 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     }
 
     @Override
-    public void update(BaseAppMetaDataBO message) {
+    public void doUpdate(JSONObject message) {
 
         System.out.println(message);
     }
 }
-  
    ```
