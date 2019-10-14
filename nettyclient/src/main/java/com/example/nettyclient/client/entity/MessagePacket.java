@@ -1,10 +1,8 @@
-package com.example.nettyclient.client.entity;
-
-import com.example.nettyclient.client.common.packet.Packet;
+package com.hx.nettyclient.client.entity;
 
 ;
 
-public class MessagePacket extends Packet {
+public class MessagePacket {
 
     private String message;
 
