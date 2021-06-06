@@ -13,7 +13,7 @@ watchdog  ->  monitor central
 
 - Agent
 
-springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责获取服务端的支付消息并调用银行客户端完成医院医保账户对企业打款
+springboot工程打成Tomcat embed jar部署在客户端所归属的服务器上，负责获取服务端的支付消息并调用银行客户端完成一次http调用
 
   - 向支付中心拉取配置信息，不同医院会有不同配置（医院标识、对接银行接口配置等）
 
