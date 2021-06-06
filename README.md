@@ -3,11 +3,17 @@ Custom netty coding, using the host mode for the company to push orders correspo
 
 >架构图
 
+Agent    <-  server admin
+
+|                ｜
+
+watchdog  ->  monitor central
+
 >通信业务流程
 
 - Agent
 
-springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责获取支付中心的支付消息并调用银行客户端完成医院医保账户对企业打款
+springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责获取服务端的支付消息并调用银行客户端完成医院医保账户对企业打款
 
   - 向支付中心拉取配置信息，不同医院会有不同配置（医院标识、对接银行接口配置等）
 
@@ -17,9 +23,9 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
 
   - 支付数据状态保存
 
-- 支付中心
+- 服务端
 
-作为医院管理支付数据的子系统，用户的支付动作会通过Agent调用银行接口完成支付及保存支付结果回调信息，货款支付信息也需要同步到结算子系统
+用户的支付动作会通过Agent调用银行接口完成支付及保存支付结果回调信息，货款支付信息也需要同步到结算子系统
 
   - 提供支付数据推送接口
 
@@ -80,10 +86,6 @@ springboot工程打成Tomcat embed jar部署在医院内网前置机上，负责
     - 服务端配置
     
             本地启动线程需要监听的端口
-
-
-![](http://git.hxmec.com/hxgroup-cxy1/hx-netty-server-sdk/blob/master/%E8%B0%83%E7%94%A8%E5%8C%BB%E9%99%A2%E5%89%8D%E7%BD%AE%E6%9C%BA%E6%B6%88%E6%81%AF%E6%94%B6%E5%8F%91%E6%97%B6%E5%BA%8F%E5%9B%BE.jpg)
-
 
 >使用场景
 
