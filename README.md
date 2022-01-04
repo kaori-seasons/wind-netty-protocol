@@ -66,10 +66,10 @@ springboot工程打成Tomcat embed jar部署在客户端所归属的服务器上
 
 - 连接配置
     ```
-    netty.hxmec.localHostAddress=192.168.38.161
+    netty.hxmec.localHostAddress=xxx.xxx.xxx.xxx
     netty.hxmec.localHostPort=7000
 
-    netty.hxmec.remoteHostAddress=192.168.38.161
+    netty.hxmec.remoteHostAddress=xxx.xxx.xxx.xxx
     netty.hxmec.remoteHostPort=8080
 
     netty.hxmec.serverBossThreadNum=3 //boss线程组的线程数
